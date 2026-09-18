@@ -1,0 +1,125 @@
+% ---------------------------------------------------------------------------
+% draft_related_work_rbq_additions.tex
+%
+% Draft paragraphs proposed for the "Related Work" section of paper/main.tex
+% under the RBQ retargeting (SUBMISSION_PLAN_MMSYS2027_RBQ_20260914, Section 6,
+% "Related Work" row). This file is a draft only; it is not included by
+% main.tex and it does not modify paper/references.bib. The keys cited below
+% are defined in paper/references_rbq_additions.bib.
+%
+% Placement note. The five paragraphs are written to follow the existing
+% stereo-matching paragraph and to precede the existing inference-serving
+% paragraph, except for the final paragraph, which is written to follow the
+% existing accelerator-reliability paragraph that cites li2017dnnresilience
+% and zheng2025save.
+%
+% Double-blind: no author or institution of the present work is named.
+% ---------------------------------------------------------------------------
+
+Narrow numerical formats for inference increasingly take the form of block
+floating point, in which a group of adjacent tensor elements shares a single
+exponent and each element retains only a sign and a short mantissa. Microsoft
+Floating Point introduced this arrangement at production scale and reported
+that sharing one exponent across a group preserves accuracy on convolutional,
+recurrent and transformer models without changing the network
+topology~\cite{rbq_rouhani2020msfp}. The construction was later standardized,
+first as the Microscaling formats described by the participating
+vendors~\cite{rbq_rouhani2023microscaling} and then as the Open Compute Project
+Microscaling specification, which fixes the block size and the power-of-two
+shared scale for MXFP8, MXFP6, MXFP4 and MXINT8~\cite{rbq_ocp2023mx}.
+Architectural studies have examined how such blocks behave in hardware, both
+for training, where block precision varies across iterations and
+layers~\cite{rbq_zhang2022fast}, and for serving, where the block carries
+additional information~\cite{rbq_lee2025mxplus}. The accelerator studied here
+exposes a format of the same family: the vendor quantizer documents a block of
+eight numbers with one eight-bit shared exponent and, per number, one sign bit
+and seven mantissa bits~\cite{rbq_amdquarkbfp16}. Because the block boundaries
+on this device fall along the input-channel axis of a convolution, the
+assignment of channels to blocks is a property of the deployed graph rather
+than of the format, and the present work treats that assignment as the quantity
+to be chosen, using a permutation that regroups channels without altering any
+parameter value, that is selected without ground-truth disparity or retraining,
+and that was measured on silicon against a random-permutation control.
+
+A second thread makes quantization groups more homogeneous by reordering the
+tensor rather than by rewriting it. Reorder-based post-training quantization
+clusters activation channels of a language model by observed range and applies
+one quantization parameter within each cluster, fusing the reordering into the
+neighbouring layers~\cite{rbq_yuan2023rptq}; later work sorts channels by a
+joint statistic of activations and weights before per-group
+quantization~\cite{rbq_cheng2026permuquant}, or composes blocks deliberately by
+pairing an outlier channel with low-magnitude
+companions~\cite{rbq_yao2026ocgquant}. Outside quantization, permuting a weight
+matrix along its channel dimension and adjusting the surrounding layers changes
+which weights survive an N:M pruning pattern while leaving inference run time
+unchanged~\cite{rbq_pool2021permutations}. These methods are distinct from
+transforms that repair quantization by changing values: cross-layer weight
+equalization, which rescales adjacent layers using the positive homogeneity of
+the activation~\cite{rbq_nagel2019dfq}, migration of activation range into the
+weights~\cite{rbq_xiao2023smoothquant}, activation-aware per-channel scaling of
+salient weight channels~\cite{rbq_lin2024awq}, and rotation of the hidden state
+by a Hadamard transform so that outliers are
+dispersed~\cite{rbq_ashkboos2024quarot}. The present work belongs to the
+reordering side of this distinction and narrows it further: the permutation is
+applied to a convolutional stereo network so that the producer's output
+channels and the consumer's input channels are permuted together, which leaves
+the floating-point function and every stored parameter value unchanged; it is
+selected by a criterion that uses no ground-truth disparity and no retraining;
+and its effect was measured on the accelerator itself with a
+random-permutation control.
+
+Training-free repair of a quantized model is normally pursued by adjusting
+parameters after calibration. Adaptive rounding replaces round-to-nearest with
+a rounding assignment obtained from a layer-wise objective on a small set of
+unlabelled inputs~\cite{rbq_nagel2020adaround}, and bias correction compensates
+the mean shift that quantization introduces into each output
+channel~\cite{rbq_nagel2019dfq}. Both are inexpensive relative to
+quantization-aware training, but both change the numbers the deployed graph
+carries, so the repaired artifact is no longer numerically identical to the
+floating-point model it came from, and both require calibration data whose
+match to the deployment distribution must be argued separately. The
+contribution reported here differs on exactly these two points: it regroups
+channels without altering any stored value, so the floating-point graph remains
+an identity of the original, and the permutation was chosen without ground
+truth and without retraining, then confirmed on silicon against a
+random-permutation control.
+
+Studies of deployment on commercial accelerators have repeatedly found that
+predictions derived from vendor abstractions do not transfer to real graphs. A
+characterization of several commercial edge devices attributed much of the
+observed performance to the framework and software stack rather than to the
+network alone~\cite{rbq_hadidi2019characterizing}. Latency prediction for edge
+devices was reorganized around measured execution units after operator-level
+summation was found to mispredict, because the compiler fuses operators into
+kernels the operator list does not expose~\cite{rbq_zhang2021nnmeter}. A
+workload characterization of Edge TPU accelerators over a large model
+population reported that performance depends on how the compiler maps a model
+to the accelerator's memory hierarchy~\cite{rbq_seshadri2022edgetpu}, and a
+recent estimator for language-model inference on commercial neural processing
+units names the undisclosed microarchitecture and the unpredictability of
+compiler optimization as reasons to prefer end-to-end measurement over analytic
+composition~\cite{rbq_park2026lens}. The observations reported here are of the
+same kind but concern a vendor toolchain for a stereo graph, and they are
+offered as secondary material supporting a positive result whose selection
+criterion is itself training-free and whose effect was verified on silicon
+rather than through a compiler-reported estimate.
+
+Output integrity has become a deployment concern in its own right. Field
+reports describe processors that compute incorrect results without raising any
+error, so that the corruption is visible only against a
+reference~\cite{rbq_hochschild2021cores}; for neural networks specifically,
+range restriction has been proposed to convert large fault-induced deviations
+into deviations the network absorbs~\cite{rbq_chen2021ranger}, complementing
+the fault-propagation and memory-protection studies discussed
+above~\cite{li2017dnnresilience, zheng2025save}. Stereo matching on edge
+hardware has meanwhile been addressed by compressing the matcher, through
+distillation followed by pruning~\cite{rbq_pan2024distillprune} and through
+residual and attention blocks arranged for real-time depth estimation on edge
+devices~\cite{rbq_liang2026rcaenet}; these report accuracy and frame rate for a
+single stereo pair and do not qualify a multi-stream deployment by comparing
+raw accelerator output against a reference. The present work keeps that
+comparison as an admission condition rather than a reported statistic, and the
+quantization result it reports was obtained under the same condition, by a
+permutation that regroups channels without altering values, that required
+neither ground truth nor retraining, and that was validated on silicon with a
+random-permutation control.

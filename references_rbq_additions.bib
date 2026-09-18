@@ -1,0 +1,457 @@
+% ---------------------------------------------------------------------------
+% references_rbq_additions.bib
+%
+% Additional bibliography for the RBQ retargeting of the MultiStereo
+% manuscript. These entries extend paper/references.bib; they do not replace
+% or duplicate any key already present there.
+%
+% Every entry below was resolved to a retrievable publication or official
+% vendor document. The verified location is recorded in the url field, and
+% the note field records the access date and, where relevant, the publication
+% status. No entry appears here that could not be verified.
+% ---------------------------------------------------------------------------
+
+
+% === Thread 1: block floating point and microscaling formats ================
+
+@inproceedings{rbq_rouhani2020msfp,
+  author    = {Bita Darvish Rouhani and Daniel Lo and Ritchie Zhao and Ming Liu
+               and Jeremy Fowers and Kalin Ovtcharov and Anna Vinogradsky and
+               Sarah Massengill and Lita Yang and Ray Bittner and Alessandro
+               Forin and Haishan Zhu and Taesik Na and Prerak Patel and Shuai
+               Che and Lok Chand Koppaka and Xia Song and Subhojit Som and
+               Kaustav Das and Saurabh Tiwary and Steve Reinhardt and Sitaram
+               Lanka and Eric Chung and Doug Burger},
+  title     = {Pushing the Limits of Narrow Precision Inferencing at Cloud
+               Scale with {Microsoft Floating Point}},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  year      = {2020},
+  publisher = {Curran Associates, Inc.},
+  url       = {https://proceedings.neurips.cc/paper/2020/hash/747e32ab0fea7fbd2ad9ec03daa3f840-Abstract.html},
+  note      = {Accessed September 14, 2026}
+}
+
+@misc{rbq_rouhani2023microscaling,
+  author       = {Bita Darvish Rouhani and Ritchie Zhao and Ankit More and
+                  Mathew Hall and Alireza Khodamoradi and Summer Deng and
+                  Dhruv Choudhary and Marius Cornea and Eric Dellinger and
+                  Kristof Denolf and Dusan Stosic and Venmugil Elango and
+                  Maximilian Golub and Alexander Heinecke and Phil James-Roxby
+                  and Dharmesh Jani and Gaurav Kolhe and Martin Langhammer and
+                  Ada Li and Levi Melnick and Maral Mesmakhosroshahi and
+                  Andres Rodriguez and Michael Schulte and Rasoul Shafipour
+                  and Lei Shao and Michael Siu and Pradeep Dubey and Paulius
+                  Micikevicius and Maxim Naumov and Colin Verrilli and Ralph
+                  Wittig and Doug Burger and Eric Chung},
+  title        = {Microscaling Data Formats for Deep Learning},
+  year         = {2023},
+  howpublished = {arXiv preprint},
+  url          = {https://arxiv.org/abs/2310.10537},
+  note         = {arXiv:2310.10537, submitted October 16, 2023; accessed
+                  September 14, 2026}
+}
+
+@misc{rbq_ocp2023mx,
+  author       = {{Open Compute Project Foundation}},
+  title        = {{OCP} Microscaling Formats ({MX}) Specification, Version 1.0},
+  year         = {2023},
+  howpublished = {Open Compute Project specification},
+  url          = {https://www.opencompute.org/documents/ocp-microscaling-formats-mx-v1-0-spec-final-pdf},
+  note         = {Defines the MXFP8, MXFP6, MXFP4 and MXINT8 formats, each a
+                  block of elements sharing one power-of-two scale. Document
+                  location confirmed September 14, 2026 through the Microsoft
+                  Azure announcement that links it,
+                  https://azure.microsoft.com/en-us/blog/fostering-ai-infrastructure-advancements-through-standardization/}
+}
+
+@misc{rbq_amdquarkbfp16,
+  author       = {{AMD}},
+  title        = {{BFP16} (Block Floating Point) Quantization},
+  year         = {2026},
+  howpublished = {AMD Quark quantizer documentation, release 0.9},
+  url          = {https://quark.docs.amd.com/release-0.9/pytorch/tutorial_bfp16.html},
+  note         = {States that a BFP16 block consists of eight numbers with an
+                  eight-bit shared exponent and, per number, one sign bit and
+                  seven mantissa bits; the configuration parameter
+                  \texttt{group\_size} is 8. Accessed September 14, 2026}
+}
+
+@inproceedings{rbq_zhang2022fast,
+  author    = {Sai Qian Zhang and Bradley McDanel and H. T. Kung},
+  title     = {{FAST}: {DNN} Training Under Variable Precision Block Floating
+               Point with Stochastic Rounding},
+  booktitle = {2022 IEEE International Symposium on High-Performance Computer
+               Architecture (HPCA)},
+  year      = {2022},
+  publisher = {IEEE},
+  url       = {https://arxiv.org/abs/2110.15456},
+  note      = {arXiv:2110.15456; published at HPCA 2022. Accessed
+               September 14, 2026}
+}
+
+@inproceedings{rbq_lee2025mxplus,
+  author    = {Jungi Lee and Junyong Park and Soohyun Cha and Jaehoon Cho and
+               Jaewoong Sim},
+  title     = {{MX+}: Pushing the Limits of Microscaling Formats for Efficient
+               Large Language Model Serving},
+  booktitle = {Proceedings of the 58th IEEE/ACM International Symposium on
+               Microarchitecture},
+  year      = {2025},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/3725843.3756118},
+  url       = {https://doi.org/10.1145/3725843.3756118},
+  note      = {Preprint also available as arXiv:2510.14557,
+               https://arxiv.org/abs/2510.14557. Accessed September 14, 2026}
+}
+
+
+% === Thread 2: channel reordering and value-modifying transforms ============
+
+@inproceedings{rbq_pool2021permutations,
+  author    = {Jeff Pool and Chong Yu},
+  title     = {Channel Permutations for {N:M} Sparsity},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {34},
+  year      = {2021},
+  publisher = {Curran Associates, Inc.},
+  url       = {https://proceedings.neurips.cc/paper/2021/hash/6e8404c3b93a9527c8db241a1846599a-Abstract.html},
+  note      = {Permutes weight matrices along the channel dimension and adjusts
+               the surrounding layers, leaving inference run time unchanged.
+               Accessed September 14, 2026}
+}
+
+@misc{rbq_yuan2023rptq,
+  author       = {Zhihang Yuan and Lin Niu and Jiawei Liu and Wenyu Liu and
+                  Xinggang Wang and Yuzhang Shang and Guangyu Sun and Qiang Wu
+                  and Jiaxiang Wu and Bingzhe Wu},
+  title        = {{RPTQ}: Reorder-Based Post-Training Quantization for Large
+                  Language Models},
+  year         = {2023},
+  howpublished = {arXiv preprint},
+  url          = {https://arxiv.org/abs/2304.01089},
+  note         = {arXiv:2304.01089, submitted April 3, 2023; accessed
+                  September 14, 2026}
+}
+
+@misc{rbq_cheng2026permuquant,
+  author       = {Yongsen Cheng and Kai Liu and Kaiwen Tao and Junxian Li and
+                  Zhixin Wang and Zhikai Chen and Renjing Pei and Yulun Zhang},
+  title        = {{PermuQuant}: Lowering Per-Group Quantization Error by
+                  Reordering Channels for Diffusion Models},
+  year         = {2026},
+  howpublished = {arXiv preprint},
+  url          = {https://arxiv.org/abs/2605.09503},
+  note         = {arXiv:2605.09503, submitted May 10, 2026, revised May 31,
+                  2026; accessed September 14, 2026}
+}
+
+@misc{rbq_yao2026ocgquant,
+  author       = {Yishan Yao and Binjun Li and Hanling Yi and Pengyu Li and
+                  Xiaoqing Liu and Zihan Yang and Xiaotian Yu and Zhiwen Yu},
+  title        = {{OCGQuant}: Outlier-Companion Grouping for {NVFP4}
+                  Quantization},
+  year         = {2026},
+  howpublished = {arXiv preprint},
+  url          = {https://arxiv.org/abs/2609.00066},
+  note         = {arXiv:2609.00066, submitted August 30, 2026; accessed
+                  September 14, 2026}
+}
+
+@inproceedings{rbq_nagel2019dfq,
+  author    = {Markus Nagel and Mart van Baalen and Tijmen Blankevoort and
+               Max Welling},
+  title     = {Data-Free Quantization Through Weight Equalization and Bias
+               Correction},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on
+               Computer Vision},
+  year      = {2019},
+  pages     = {1325--1334},
+  doi       = {10.1109/ICCV.2019.00141},
+  url       = {https://arxiv.org/abs/1906.04721},
+  note      = {Accessed September 14, 2026}
+}
+
+@inproceedings{rbq_xiao2023smoothquant,
+  author    = {Guangxuan Xiao and Ji Lin and Mickael Seznec and Hao Wu and
+               Julien Demouth and Song Han},
+  title     = {{SmoothQuant}: Accurate and Efficient Post-Training Quantization
+               for Large Language Models},
+  booktitle = {Proceedings of the 40th International Conference on Machine
+               Learning},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {202},
+  pages     = {38087--38099},
+  year      = {2023},
+  publisher = {PMLR},
+  url       = {https://proceedings.mlr.press/v202/xiao23c.html},
+  note      = {Accessed September 14, 2026}
+}
+
+@inproceedings{rbq_lin2024awq,
+  author    = {Ji Lin and Jiaming Tang and Haotian Tang and Shang Yang and
+               Wei-Ming Chen and Wei-Chen Wang and Guangxuan Xiao and
+               Xingyu Dang and Chuang Gan and Song Han},
+  title     = {{AWQ}: Activation-Aware Weight Quantization for On-Device
+               {LLM} Compression and Acceleration},
+  booktitle = {Proceedings of Machine Learning and Systems},
+  volume    = {6},
+  year      = {2024},
+  url       = {https://proceedings.mlsys.org/paper_files/paper/2024/hash/42a452cbafa9dd64e9ba4aa95cc1ef21-Abstract-Conference.html},
+  note      = {Accessed September 14, 2026}
+}
+
+@inproceedings{rbq_ashkboos2024quarot,
+  author    = {Saleh Ashkboos and Amirkeivan Mohtashami and Maximilian L. Croci
+               and Bo Li and Pashmina Cameron and Martin Jaggi and
+               Dan Alistarh and Torsten Hoefler and James Hensman},
+  title     = {{QuaRot}: Outlier-Free 4-Bit Inference in Rotated {LLMs}},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {37},
+  year      = {2024},
+  publisher = {Curran Associates, Inc.},
+  url       = {https://neurips.cc/virtual/2024/poster/94328},
+  note      = {Preprint arXiv:2404.00456, https://arxiv.org/abs/2404.00456.
+               Accessed September 14, 2026}
+}
+
+
+% === Thread 3: post-training, training-free quantization repair =============
+
+@inproceedings{rbq_nagel2020adaround,
+  author    = {Markus Nagel and Rana Ali Amjad and Mart van Baalen and
+               Christos Louizos and Tijmen Blankevoort},
+  title     = {Up or Down? Adaptive Rounding for Post-Training Quantization},
+  booktitle = {Proceedings of the 37th International Conference on Machine
+               Learning},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {119},
+  pages     = {7197--7206},
+  year      = {2020},
+  publisher = {PMLR},
+  url       = {http://proceedings.mlr.press/v119/nagel20a.html},
+  note      = {Accessed September 14, 2026}
+}
+
+
+% === Thread 4: vendor compilers and cost-model unpredictability =============
+
+@inproceedings{rbq_zhang2021nnmeter,
+  author    = {Li Lyna Zhang and Shihao Han and Jianyu Wei and Ningxin Zheng
+               and Ting Cao and Yuqing Yang and Yunxin Liu},
+  title     = {{nn-Meter}: Towards Accurate Latency Prediction of
+               Deep-Learning Model Inference on Diverse Edge Devices},
+  booktitle = {Proceedings of the 19th Annual International Conference on
+               Mobile Systems, Applications, and Services},
+  year      = {2021},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/3458864.3467882},
+  url       = {https://doi.org/10.1145/3458864.3467882},
+  note      = {Accessed September 14, 2026}
+}
+
+@inproceedings{rbq_seshadri2022edgetpu,
+  author    = {Kiran Seshadri and Berkin Akin and James Laudon and
+               Ravi Narayanaswami and Amir Yazdanbakhsh},
+  title     = {An Evaluation of {Edge TPU} Accelerators for Convolutional
+               Neural Networks},
+  booktitle = {2022 IEEE International Symposium on Workload Characterization
+               (IISWC)},
+  year      = {2022},
+  publisher = {IEEE},
+  url       = {https://ieeexplore.ieee.org/document/9975395},
+  note      = {Preprint arXiv:2102.10423, https://arxiv.org/abs/2102.10423.
+               Accessed September 14, 2026}
+}
+
+@inproceedings{rbq_hadidi2019characterizing,
+  author    = {Ramyad Hadidi and Jiashen Cao and Yilun Xie and Bahar Asgari
+               and Tushar Krishna and Hyesoon Kim},
+  title     = {Characterizing the Deployment of Deep Neural Networks on
+               Commercial Edge Devices},
+  booktitle = {2019 IEEE International Symposium on Workload Characterization
+               (IISWC)},
+  year      = {2019},
+  pages     = {35--48},
+  publisher = {IEEE},
+  url       = {https://ieeexplore.ieee.org/document/9041955},
+  note      = {Author manuscript at
+               http://www.cs.umd.edu/~bahar/papers/iiswc19-edge.pdf.
+               Accessed September 14, 2026}
+}
+
+@misc{rbq_park2026lens,
+  author       = {Juhyun Park and Seungwoo Jeong and Jingyu Lee and
+                  Kyungyong Lee},
+  title        = {Latency Prediction for {LLM} Inference on {NPU} Systems},
+  year         = {2026},
+  howpublished = {arXiv preprint},
+  url          = {https://arxiv.org/abs/2606.18042},
+  note         = {arXiv:2606.18042, submitted June 16, 2026, revised June 17,
+                  2026; accessed September 14, 2026}
+}
+
+
+% === Thread 5: output integrity and silent corruption ======================
+
+@inproceedings{rbq_hochschild2021cores,
+  author    = {Peter H. Hochschild and Paul Turner and Jeffrey C. Mogul and
+               Rama Govindaraju and Parthasarathy Ranganathan and
+               David E. Culler and Amin Vahdat},
+  title     = {Cores That Don't Count},
+  booktitle = {Proceedings of the Workshop on Hot Topics in Operating Systems},
+  year      = {2021},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/3458336.3465297},
+  url       = {https://doi.org/10.1145/3458336.3465297},
+  note      = {Author copy at
+               https://sigops.org/s/conferences/hotos/2021/papers/hotos21-s01-hochschild.pdf.
+               Accessed September 14, 2026}
+}
+
+@inproceedings{rbq_chen2021ranger,
+  author    = {Zitao Chen and Guanpeng Li and Karthik Pattabiraman},
+  title     = {A Low-Cost Fault Corrector for Deep Neural Networks Through
+               Range Restriction},
+  booktitle = {2021 51st Annual IEEE/IFIP International Conference on
+               Dependable Systems and Networks (DSN)},
+  year      = {2021},
+  publisher = {IEEE},
+  url       = {https://ieeexplore.ieee.org/document/9505066},
+  note      = {Preprint arXiv:2003.13874, https://arxiv.org/abs/2003.13874.
+               Accessed September 14, 2026}
+}
+
+
+% === Thread 6: stereo matching deployed on edge hardware ===================
+
+@inproceedings{rbq_pan2024distillprune,
+  author    = {Baiyu Pan and Jichao Jiao and Jianxing Pang and Jun Cheng},
+  title     = {Distill-Then-Prune: An Efficient Compression Framework for
+               Real-Time Stereo Matching Network on Edge Devices},
+  booktitle = {2024 IEEE International Conference on Robotics and Automation
+               (ICRA)},
+  year      = {2024},
+  publisher = {IEEE},
+  url       = {https://arxiv.org/abs/2405.11809},
+  note      = {arXiv:2405.11809; published at ICRA 2024. Accessed
+               September 14, 2026}
+}
+
+@article{rbq_liang2026rcaenet,
+  author  = {Bifa Liang and Yichao Wang and Ziyang Hu and Zhi-Cong Huang and
+             Haifeng Hu and Jianming Xu and Di-Hu Chen},
+  title   = {{RCAENet}: Residual Convolutional and Attention-Enhanced Stereo
+             Matching for Real-Time Depth Estimation on Edge Devices},
+  journal = {ACM Transactions on Multimedia Computing, Communications and
+             Applications},
+  volume  = {22},
+  year    = {2026},
+  publisher = {Association for Computing Machinery},
+  doi     = {10.1145/3788678},
+  url     = {https://doi.org/10.1145/3788678},
+  note    = {Accessed September 14, 2026}
+}
+
+% === Thread 6: the classical matcher and the synthetic population ==========
+% Added 2026-09-15 for review item 4(i). Both records were checked against the
+% publisher's metadata before the entries were written.
+
+@article{rbq_hirschmuller2008sgm,
+  author    = {Heiko Hirschm{\"u}ller},
+  title     = {Stereo Processing by Semiglobal Matching and Mutual
+               Information},
+  journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume    = {30},
+  number    = {2},
+  pages     = {328--341},
+  year      = {2008},
+  publisher = {IEEE},
+  issn      = {0162-8828},
+  doi       = {10.1109/TPAMI.2007.1166},
+  url       = {https://doi.org/10.1109/TPAMI.2007.1166},
+  note      = {Accessed September 15, 2026}
+}
+
+@inproceedings{rbq_mayer2016sceneflow,
+  author    = {Nikolaus Mayer and Eddy Ilg and Philip H{\"a}usser and Philipp
+               Fischer and Daniel Cremers and Alexey Dosovitskiy and Thomas
+               Brox},
+  title     = {A Large Dataset to Train Convolutional Networks for Disparity,
+               Optical Flow, and Scene Flow Estimation},
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and
+               Pattern Recognition},
+  pages     = {4040--4048},
+  year      = {2016},
+  publisher = {IEEE Computer Society},
+  doi       = {10.1109/CVPR.2016.438},
+  url       = {https://doi.org/10.1109/CVPR.2016.438},
+  note      = {Preprint also available as arXiv:1512.02134. Accessed
+               September 15, 2026}
+}
+
+% === Thread 7: architectural family and on-device multi-DNN coordination ===
+% Added 2026-09-15 for review decision 7. Every field below was checked against
+% the publisher record, the author's own publication list or the paper's own
+% ACM reference block before the entry was written.
+
+@inproceedings{rbq_tankovich2021hitnet,
+  author    = {Vladimir Tankovich and Christian H{\"a}ne and Yinda Zhang and
+               Adarsh Kowdle and Sean Fanello and Sofien Bouaziz},
+  title     = {{HITNet}: Hierarchical Iterative Tile Refinement Network for
+               Real-time Stereo Matching},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
+               Pattern Recognition},
+  pages     = {14362--14372},
+  year      = {2021},
+  publisher = {IEEE},
+  doi       = {10.1109/CVPR46437.2021.01413},
+  url       = {https://doi.org/10.1109/CVPR46437.2021.01413},
+  note      = {Preprint also available as arXiv:2007.12140. Accessed
+               September 15, 2026}
+}
+
+@inproceedings{rbq_guo2025lightstereo,
+  author    = {Xianda Guo and Chenming Zhang and Youmin Zhang and Wenzhao
+               Zheng and Dujun Nie and Matteo Poggi and Long Chen},
+  title     = {{LightStereo}: Channel Boost Is All You Need for Efficient {2D}
+               Cost Aggregation},
+  booktitle = {2025 IEEE International Conference on Robotics and Automation
+               (ICRA)},
+  pages     = {8738--8744},
+  year      = {2025},
+  publisher = {IEEE},
+  doi       = {10.1109/ICRA55743.2025.11127711},
+  url       = {https://doi.org/10.1109/ICRA55743.2025.11127711},
+  note      = {Preprint also available as arXiv:2406.19833. Accessed
+               September 15, 2026}
+}
+
+@inproceedings{rbq_jeong2022band,
+  author    = {Joo Seong Jeong and Jingyu Lee and Donghyun Kim and Changmin
+               Jeon and Changjin Jeong and Youngki Lee and Byung-Gon Chun},
+  title     = {{Band}: Coordinated Multi-{DNN} Inference on Heterogeneous
+               Mobile Processors},
+  booktitle = {Proceedings of the 20th Annual International Conference on
+               Mobile Systems, Applications and Services},
+  pages     = {235--247},
+  year      = {2022},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/3498361.3538948},
+  url       = {https://doi.org/10.1145/3498361.3538948},
+  note      = {Accessed September 15, 2026}
+}
+
+@inproceedings{rbq_han2024pantheon,
+  author    = {Lixiang Han and Zimu Zhou and Zhenjiang Li},
+  title     = {{Pantheon}: Preemptible Multi-{DNN} Inference on Mobile Edge
+               {GPUs}},
+  booktitle = {Proceedings of the 22nd Annual International Conference on
+               Mobile Systems, Applications and Services},
+  pages     = {465--478},
+  year      = {2024},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/3643832.3661878},
+  url       = {https://doi.org/10.1145/3643832.3661878},
+  note      = {Accessed September 15, 2026}
+}

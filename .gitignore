@@ -1,0 +1,13 @@
+# Generated manuscript files; the uploaded template PDFs remain tracked.
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+/main.pdf
