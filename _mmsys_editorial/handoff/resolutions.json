@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "repository": "choonghan-robotics/MMSYS",
+  "branch": "chatgpt/mmsys-editorial-sync-20260918",
+  "note": "Editorial synchronization is not experimental verification.",
+  "items": {
+    "E01": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E02": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E03": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E04": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E05": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E06": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E07": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E08": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E09": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E10": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E11": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E12": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    },
+    "E13": {
+      "status": "OPEN",
+      "evidence_files": [],
+      "run_ids": [],
+      "resolution": null
+    }
+  }
+}
