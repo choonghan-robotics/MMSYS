@@ -12,7 +12,7 @@
     },
     {
       "id": "E03",
-      "status": "VERIFIED"
+      "status": "QUALIFIED"
     },
     {
       "id": "E04",
@@ -40,7 +40,7 @@
     },
     {
       "id": "E10",
-      "status": "VERIFIED"
+      "status": "QUALIFIED"
     },
     {
       "id": "E11",
@@ -56,9 +56,14 @@
     }
   ],
   "summary": {
-    "verified": 11,
-    "qualified": 2,
+    "verified": 9,
+    "qualified": 4,
     "open": 0,
-    "note": "Full end-to-end pass (2026-09-18): 11 VERIFIED against primary sources found and reconciled this pass (E01,E02,E03,E04,E05,E06,E08,E09,E10,E11,E12), plus E07/E13 kept QUALIFIED for two disclosed, unresolved sub-gaps (fig/prose 0.002pp on the R6 panel_b point; E03 internal-validation-split range source not located) rather than closed without evidence."
+    "note": "Canonical post-agent status: 9 VERIFIED / 4 QUALIFIED (E03,E07,E10,E13). QUALIFIED is intentionally not equivalent to VERIFIED."
+  },
+  "paper_repository_policy": {
+    "target_repository": "__USER_INPUT__",
+    "base_branch": "__USER_INPUT__",
+    "rule": "User-specified only; do not infer."
   }
 }
