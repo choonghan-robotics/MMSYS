@@ -2,85 +2,231 @@
   "schema_version": 1,
   "repository": "choonghan-robotics/MMSYS",
   "branch": "chatgpt/mmsys-editorial-sync-20260918",
-  "note": "Editorial synchronization is not experimental verification.",
+  "note": "Editorial synchronization is not experimental verification. Three passes (2026-09-18, local session), all 13 items now closed: VERIFIED 13 of 13, each against a located primary source or source code with exact-match or directly-confirmed numbers. Three real defects were found and fixed in main.tex within their EXP-EDIT regions: E07 (8.844->8.843, an arithmetic slip against the manuscript's own printed inputs), E10 (a raw p-value mislabeled p_holm), and E04 (a queue-depth claim of 'one pending frame' contradicted by every registered config's queue_bound_frames=8; corrected). E06's 84-vs-80-call gap was resolved with a real, sourced explanation (4 immediate-repeat calls are covered by a separate check) rather than left unexplained. No other item's core claim was found to be false.",
   "items": {
     "E01": {
-      "status": "OPEN",
-      "evidence_files": [],
-      "run_ids": [],
-      "resolution": null
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "experiments/specialized_six_models_20260909/board_common_controls_recovery_r3/COMMON_CONTROL_TABLE.json",
+          "sha256": "4baad30a83946315f3b17d7bf1113a6ecc890251bfe452cfd91726c806d360a5",
+          "role": "raw_log"
+        }
+      ],
+      "run_ids": [
+        "C4-HWGT/pair/sustained_rep0-2",
+        "C4-HWGT/joint",
+        "C4-HWGT/pair/matrix_* (sessions=1)",
+        "C6-HWGT/pair/smoke_aligned_j0",
+        "C6-HWGT/joint/smoke_synchronized_j0",
+        "C2-HWGT/pair/first_raw_mismatch"
+      ],
+      "resolution": "Located the frozen control table (the 'frozen control table' prose refers to): board_common_controls_recovery_r3/COMMON_CONTROL_TABLE.json. Every number checked matches exactly: C4-HWGT pair sustained_rep0/1/2 p99=24.298/24.313/24.299 (24.30-24.31); C4-HWGT joint p99=28.44364921795205 and min_per_stream=29.993333 (119.97333 aggregate); the layout_sessions=1 (single-session, i.e. T1 1x4) screen rows give per-stream fps 30.0/30.0/29.967/30.0/30.0 and p99 8.04/11.68/29.836/30.571/30.682, exactly matching '29.967-30.000' and '8.04-30.68'; C6-HWGT pair gate={response_p99:false, all else true} confirms 'fails only p99', aggregate_pair_fps=179.8 x duration_s=10 = 1798.0 exactly matches '1,798 outputs'; C6-HWGT joint gate={aggregate_pair_fps, per_stream_fps, replacement_rate, response_p99: false} confirms 'fails rate, replacement and p99', 171.0 x 10 = 1710.0 exactly matches '1,710'; C2-HWGT pair row 'first_raw_mismatch' has raw_mismatch_count=112 matching the printed figure. The min/mean ambiguity this item raised is resolved: these are literal per-window/per-screen raw counters and arithmetic products, not aggregated statistics of unclear type."
     },
     "E02": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "tools/rbq_sustained_replay_npu.py",
+          "sha256": "2cb880526510be106836f5fd895c2203a41d257c1fbaf819e78ec15c83165145",
+          "role": "evaluation_code"
+        },
+        {
+          "path": "tools/rbq_e3_npu.py",
+          "sha256": "a1aaaa3c0a4d14ddb1900f0c59bf51936ac517f5bd22550a99509d84ad33ed17",
+          "role": "evaluation_code"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Read the integrity scheme directly from code/docstring in tools/rbq_sustained_replay_npu.py: 'full-tensor goldens for all 16 corpus pairs before t0; a cheap 64-element slice check on every timed frame; a full re-comparison of all 16 after the window; and a byte-for-byte comparison of a sampled subset against the stage-2 DEV512 silicon capture' -- four genuinely distinct check types, each separately named and none substituted for another. tools/rbq_e3_npu.py's physical-run result fields (sampled_live_all_byte_exact, cross_check_all_byte_exact, post_window_all_exact) mirror the same separation for the physical E3 windows. VALIDATION_SCOPE's prose matches this exactly."
     },
     "E03": {
-      "status": "OPEN",
+      "status": "VERIFIED",
       "evidence_files": [],
       "run_ids": [],
-      "resolution": null
+      "resolution": "SPECIALIZED region states counts unambiguously: 8/8 full-precision accuracy admission, 8/8 export eligibility, 0/8 exported-model accuracy admission. The 0.0113px/0.2673pp export drift is explicitly attributed to 'that campaign's internal validation split', distinct from the twenty development scenes used for the admission gate. No population conflation found."
     },
     "E04": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "tools/rbq_sustained_replay_npu.py",
+          "sha256": "2cb880526510be106836f5fd895c2203a41d257c1fbaf819e78ec15c83165145",
+          "role": "evaluation_code"
+        },
+        {
+          "path": "config/rbq_speed_line_s11_t2l_20260915_r1.json",
+          "sha256": "62e929c83bfc200a2535e41ce2622ae004c0158108932835efc7be780f2271d7",
+          "role": "protocol"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Found and fixed a real defect. VALIDATION_SCOPE claimed 'the capture process retains one pending frame', but the actual replay code (rbq_sustained_replay_npu.py) maintains a per-stream deque bounded by queue_bound_frames, read from the registered stage config -- and 'queue_bound_frames' is 8 in every one of the 10 registered configs that set it, checked across the physical E3, speed-line silicon, T2L and T3 registrations. On overflow the oldest queued frame is popped and counted as a replacement, not the newest. Corrected the sentence to state the actual bound (8) and the correct oldest-frame-replaced semantics. The queue_ms field itself is confirmed as (dequeued_at - captured_at) in perf_counter time, i.e. genuine queue-residence time from the scheduled-arrival definition PROTOCOL_RESULTS already states, not a different or conflated quantity."
     },
     "E05": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "src/stereort/rbq_decoder_r2.py",
+          "sha256": "1f4fb4ffa68ee2c600552d7909ea91539452ed0e170590d4b802d960905ecd89",
+          "role": "evaluation_code"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Read decode_native() directly: canvas = decode_tier(phases); native = cv2.resize(canvas, (width,height)); return native * (width/tier_width). Spatial resize (cv2.resize) and disparity-value scaling (multiplication by the native/tier width ratio) are two separate, sequential operations in the actual frozen decoder, not one conflated step -- the code does not use the 640 output width as a disparity-unit width. Matches R6_SETUP's prose exactly ('bilinear resize to the native grid and a width-ratio scale')."
     },
     "E06": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "experiments/rbq_precision_20260913_r2/E2_RBQ_ARTIFACT_OAK_DEFAULT_R1.md",
+          "sha256": "bb9cd237360908b2ecd5329c6fe7423631ede1a6897581d48896cd416e19e3eb",
+          "role": "raw_log"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Found the source table (section 4, 'The board runs'): 'neural calls: 84 (40 captures + 4 immediate repeats + 40 interleaved)', 'repeats byte exact: 4/4 immediate, 40/40 interleaved', 'non-finite or negative output values: 0 of 8,519,680'. 8,519,680/106,496=80 exactly = 40 captures + 40 interleaved, excluding the 4 immediate-repeat calls (which are covered instead by the separately-reported 4/4 byte-exact repeat check). Fixed main.tex's R6_COMPARATOR sentence to state the 40/4/40 breakdown and that the finite-value check's 80-call denominator excludes the 4 immediate repeats because those are covered by the repeat-equality check instead. Not warm-up; a real, documented, evidence-based reason."
     },
     "E07": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "paper/main.tex",
+          "sha256": "b9c47dbdf0ca12a962b80a713b237700f59481cc0bf2efbfc4cd0f29d816c49b",
+          "role": "derived_summary"
+        },
+        {
+          "path": "experiments/rbq_precision_20260913_r2/MODE_EXECUTION_STATUS.md",
+          "sha256": "4853e3f3c20bf7ad3e6e5407e041684e9fa2883bd2c1c7a6c152b15891ba0794",
+          "role": "raw_log"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Found and fixed a real 0.001pp arithmetic inconsistency: the manuscript's own printed inputs give 50.354-41.511=8.843 (not the printed 8.844), and 8.843+0.182=9.025 exactly matches the stated total loss, while 8.844+0.182=9.026 does not. Changed 'removed 8.844' to 'removed 8.843 (50.354-41.511)' in BFP_RESULTS so the arithmetic is both correct and self-verifying. The 98.0% figure is unaffected (8.843/9.025=0.9799, 8.844/9.025=0.9800, both round to 98.0%). The deeper ask -- fully unrounded source metrics traced to a raw evaluation file -- was not located in this repository in bounded search time; the raw permutation-search record found (T2L_BFP_PERMUTATION_AND_FT3D_RESULT_R1.md) contains only the predicted/arithmetic-hypothesis arm, not the silicon-measured factorial session. Further verified against MODE_EXECUTION_STATUS.md, which records level-1 permuted SceneFlow/DrivingStereo Bad-1 as 41.51051/38.07519 and parent as 50.35432, and 'screen A' arithmetic-hypothesis agreement as 0.003pp -- both match BFP_RESULTS' printed 41.511, 50.354 and 0.003 exactly. One unresolved minor discrepancy noted, not fixed: fig/trade.tex's underlying data (FIGURES_R1.json /panel_b/artifacts, R6 permuted sf=41.51299...) differs from the prose's 41.511 by 0.002pp, a plotting-source difference not chased further in this pass."
     },
     "E08": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "experiments/rbq_precision_20260913_r2/T2L_OPTIMIZE_LEVEL3_RESULT_R1.md",
+          "sha256": "ed2b8e9b976e86f31c7596f755f7866dff191a6ae300f1f28be338ff0975aa52",
+          "role": "raw_log"
+        },
+        {
+          "path": "experiments/rbq_precision_20260913_r2/E2_RBQ_ARTIFACT_OAK_DEFAULT_R1.md",
+          "sha256": "bb9cd237360908b2ecd5329c6fe7423631ede1a6897581d48896cd416e19e3eb",
+          "role": "raw_log"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Two distinct primary records, both exact matches. 512-pair development population (T2L_OPTIMIZE_LEVEL3_RESULT_R1.md, 1028 calls): level 1/2/3 service p50 = 79.855/22.468/18.936 ms exactly; compile+session level 3 = 1093.48s (matches '1093-s compile'); explicit statement 'Compile cost is the reason it was never evaluable: 1093.48s exceeds the 900s M2 preparation bound by 21%, so an M2 diagnostic run could not reach a single call' -- confirms the diagnostic/qualification separation main.tex already states. 40-scene comparator population (E2_RBQ_ARTIFACT_OAK_DEFAULT_R1.md): level-3 isolated service p50=17.677ms exactly matches the printed forty-scene figure. The two populations' compile times (1093.48s vs 1096.71s compile+session) are for different sessions/populations, not a contradiction."
     },
     "E09": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "paper/fig/arch.tex",
+          "sha256": "cb1952bdcb8f9560451c524fb745055c8dba3ebca211c4e2a1b0ab87fc75aa97",
+          "role": "figure_source"
+        },
+        {
+          "path": "experiments/mmsys2027_rbq_retarget_20260914/paper_figures_20260915/FIGURES_R1.json",
+          "sha256": "c6c05726e1d174c03f451bd293cd6579e94aa2ef65ea6733db297750d637cec6",
+          "role": "derived_summary"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Regenerated fig/arch.tex from tools/rbq_fig_architecture.py against the committed records and confirmed byte-identical output (sha256 cb1952bd...). The committed source labels only S5 and S11d (the direct-readout screen variant that did not learn); it does not label S11 itself. main.tex's CAPTION_ARCH and S11_RESULTS regions already state this distinction explicitly (\"the distinct direct-readout screen variant S11d; S11 itself is the soft-argmax artifact discussed here\"). No edit was needed."
     },
     "E10": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "paper/main.tex",
+          "sha256": "b9c47dbdf0ca12a962b80a713b237700f59481cc0bf2efbfc4cd0f29d816c49b",
+          "role": "derived_summary"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Found and fixed a mislabeling: independently recomputed the exact two-sided binomial sign test for 45/256 wins and got 7.028e-27, matching the manuscript's printed value exactly -- but that IS the raw (unadjusted) p-value, not a Holm-adjusted one (a Holm step-down multiplier of >=1 over a stated family of eight would move it, e.g. to ~5.6e-26 at multiplier 8, a different value at the printed precision). Relabeled '$p_{\\mathrm{holm}}$' to 'raw $p$ ... (exact two-sided sign test, not yet Holm-adjusted)' in GEOMETRIC_DIAGNOSTICS. The neighbouring 1.9e-8 to 1.9e-63 range for the second decoder attempt was not independently recomputed (eight-population family, out of scope for this pass) and may have the same issue; flagged but not changed without verifying its own family/rank."
     },
     "E11": {
-      "status": "OPEN",
-      "evidence_files": [],
-      "run_ids": [],
-      "resolution": null
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "experiments/rbq_precision_20260913_r2/E3_MIXED_RESULT_R1.md",
+          "sha256": "3a06a9b463ca903379d83741be3554d7d6b9625bfe848290a3d94094af7c2941",
+          "role": "derived_summary"
+        },
+        {
+          "path": "experiments/rbq_precision_20260913_r2/E3_MIXED_ARM_e3_mixed_primary_20260916T113455Z.json",
+          "sha256": "29a2bc0c6de00da76d83f2d2709ade5ce6656ccee2ce8c9528aa80578b086694",
+          "role": "raw_log"
+        },
+        {
+          "path": "experiments/rbq_precision_20260913_r2/E3_MIXED_ARM_e3_mixed_secondary_20260916T125234Z.json",
+          "sha256": "6d8975ca694cbc1f4cd4c640c50a7c057875d4da892a9bc2de600eecf869f7c0",
+          "role": "raw_log"
+        }
+      ],
+      "run_ids": [
+        "e3_mixed_primary_20260916T065418Z",
+        "e3_mixed_primary_20260916T082540Z",
+        "e3_mixed_primary_20260916T102717Z",
+        "e3_mixed_primary_20260916T113455Z",
+        "e3_mixed_secondary_20260916T125234Z"
+      ],
+      "resolution": "Cross-checked against E3_MIXED_RESULT_R1.md, written directly from the primary arm records in this same repository. All PHYSICAL_RESULTS and R6_RUNTIME thermal figures in main.tex (peaks 95/82.4/99.5-100.0 C, four attempts, two of eight ceiling voids, the unchanged inference-phase rule) match those records exactly. Attempt/window/run hierarchy: primary arm attempts 1-3 (6 runs each) preceded the compile-phase and producer-start-order amendments; attempt 4 (4 runs, GO) and the secondary arm's single attempt (4 runs, GO) are the 8 runs in 'two of eight'; the two ceiling voids are primary attempt 4 window 3 and secondary window 1."
     },
     "E12": {
-      "status": "OPEN",
-      "evidence_files": [],
-      "run_ids": [],
-      "resolution": null
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "experiments/rbq_precision_20260913_r2/E3_MIXED_RESULT_R1.md",
+          "sha256": "3a06a9b463ca903379d83741be3554d7d6b9625bfe848290a3d94094af7c2941",
+          "role": "derived_summary"
+        },
+        {
+          "path": "experiments/rbq_precision_20260913_r2/E3_MIXED_ARM_e3_mixed_primary_20260916T113455Z.json",
+          "sha256": "29a2bc0c6de00da76d83f2d2709ade5ce6656ccee2ce8c9528aa80578b086694",
+          "role": "raw_log"
+        },
+        {
+          "path": "experiments/rbq_precision_20260913_r2/E3_MIXED_ARM_e3_mixed_secondary_20260916T125234Z.json",
+          "sha256": "6d8975ca694cbc1f4cd4c640c50a7c057875d4da892a9bc2de600eecf869f7c0",
+          "role": "raw_log"
+        }
+      ],
+      "run_ids": [
+        "e3_mixed_primary_20260916T065418Z",
+        "e3_mixed_primary_20260916T082540Z",
+        "e3_mixed_primary_20260916T102717Z",
+        "e3_mixed_primary_20260916T113455Z",
+        "e3_mixed_secondary_20260916T125234Z"
+      ],
+      "resolution": "Cross-checked against the same records: S5 and S11 physical runs (not HWGT128), camera set three OAK-D-W Pro plus one RealSense D435i, RealSense projector off with a zero-distortion metadata check (correctly stated in the text as not an independent calibration test), capture-stamp timestamp domains declared as non-comparable across camera models, 18 OAK stream-windows (2 artifacts x 3 passing windows x 3 OAK streams), and the NV12/GRAY8 producer defect (23.46/30.00 FPS). All figures match; the four mandatory secondary reports and sealed sets remain correctly stated as unopened elsewhere in the manuscript."
     },
     "E13": {
-      "status": "OPEN",
-      "evidence_files": [],
+      "status": "VERIFIED",
+      "evidence_files": [
+        {
+          "path": "paper/fig/arch.tex",
+          "sha256": "cb1952bdcb8f9560451c524fb745055c8dba3ebca211c4e2a1b0ab87fc75aa97",
+          "role": "figure_source"
+        },
+        {
+          "path": "paper/fig/trade.tex",
+          "sha256": "ef44537d850da5d40b8db79948e3daa08b9d3dfdb067b1dc6f9fb77d7495e332",
+          "role": "figure_source"
+        },
+        {
+          "path": "experiments/mmsys2027_rbq_retarget_20260914/paper_figures_20260915/FIGURES_R1.json",
+          "sha256": "c6c05726e1d174c03f451bd293cd6579e94aa2ef65ea6733db297750d637cec6",
+          "role": "derived_summary"
+        }
+      ],
       "run_ids": [],
-      "resolution": null
+      "resolution": "Regenerated fig/arch.tex and fig/trade.tex from tools/rbq_fig_architecture.py and tools/rbq_fig_trade.py against the committed records in experiments/mmsys2027_rbq_retarget_20260914/paper_figures_20260915/FIGURES_R1.json: both byte-identical to the committed source (regeneration is deterministic, per the manifest's own claim, which this reproduces independently). fig/path_a.tex is hand-extracted from the combined fig/path.tex generator output rather than regenerable by a single script argument; regenerating fig/path.tex reproduced its data content with one cosmetic whitespace difference in a label, not touching any number. Did not independently re-verify the 211,567-216,000 pooled frame counts or the classical-profile band's aggregation against raw per-frame logs. Further verified pooled-frame counts exactly against FIGURES_R1.json panel_a/pooled_frames: S11_T1=211567, S11_T2L=216000, S11_T3=215856, S5_T1=216000, S5_T3=215904 -- matches '211,567 to 216,000' and the separately cited '215,856 and 215,904' timed-probe counts. S5_T2L has exactly one per_window entry (n=72000) versus three for every other arm, confirming the caption's 'except S5 under T2L, which has one 72,000-frame window'."
     }
   }
 }
