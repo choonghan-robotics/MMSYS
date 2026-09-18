@@ -1,0 +1,77 @@
+
+% Execution-organization overview: editorial schematic for four streams.
+\begingroup%
+\definecolor{orgBlue}{RGB}{0,87,132}%
+\definecolor{orgTeal}{RGB}{0,121,107}%
+\definecolor{orgOrange}{RGB}{143,67,29}%
+\newcommand{\OrgSmall}{\fontsize{7.2}{8.5}\selectfont}%
+\newcommand{\OrgTiny}{\fontsize{6.5}{7.5}\selectfont}%
+\newcommand{\OrgTitle}{\fontsize{8.6}{10.0}\selectfont\bfseries}%
+\newcommand{\StreamQueue}[4]{%
+  \draw[rounded corners=2pt,draw=black!60] (#1,#2) rectangle ++(36,16);
+  \node[font=\OrgSmall,align=center] at ({#1+18},{#2+8}) {#3};
+  \draw[rounded corners=1.5pt,draw=black!45,fill=black!4] (#1+42,#2+2) rectangle ++(16,12);
+  \node[font=\OrgTiny] at ({#1+50},{#2+8}) {Q};
+  \draw[-{Stealth[length=2.6pt,width=3pt]},draw=black!65] (#1+58,#2+8) -- (#4,#2+8);
+}%
+\begin{tikzpicture}[x=1pt,y=1pt,line width=0.45pt]
+\path[use as bounding box] (0,0) rectangle (504,166);
+
+% Panel boundaries
+\foreach \x/\title/\col in {0/{(a) T1: one shared session}/orgBlue,172/{(b) T2L: private sessions}/orgTeal,344/{(c) T3: one joint call}/orgOrange}{%
+  \draw[rounded corners=3pt,draw=black!25] (\x,0) rectangle ++(160,166);
+  \node[anchor=west,font=\OrgTitle,text=\col] at (\x+4,158) {\title};
+}
+
+% T1 panel
+\StreamQueue{6}{124}{Cam 1}{72}
+\StreamQueue{6}{100}{Cam 2}{72}
+\StreamQueue{6}{76}{Cam 3}{72}
+\StreamQueue{6}{52}{Cam 4}{72}
+\draw[rounded corners=2pt,draw=orgBlue!80,fill=orgBlue!6] (72,54) rectangle ++(34,86);
+\node[font=\OrgSmall,align=center,text width=28pt] at (89,97) {Earliest head pair\\scheduler};
+\draw[-{Stealth[length=3pt,width=3.2pt]},draw=black!70] (106,97) -- (118,97);
+\draw[rounded corners=2pt,draw=orgBlue!85,fill=white] (118,72) rectangle ++(36,50);
+\node[font=\OrgSmall,align=center] at (136,97) {Shared\\session};
+\draw[-{Stealth[length=3pt,width=3.2pt]},draw=black!70] (154,97) -- (160,97);
+\node[anchor=east,font=\OrgTiny,align=right,text width=42pt] at (156,61) {one call\\= one pair};
+\draw[rounded corners=2pt,draw=black!55,fill=black!3] (118,18) rectangle ++(36,22);
+\node[font=\OrgTiny,align=center] at (136,29) {decode /\\publish};
+\draw[-{Stealth[length=2.6pt,width=3pt]},draw=black!60,densely dashed] (136,72) -- (136,40);
+
+% T2L panel
+\foreach \y/\cam in {124/Cam 1,100/Cam 2,76/Cam 3,52/Cam 4}{%
+  \draw[rounded corners=2pt,draw=black!60] (178,\y) rectangle ++(32,16);
+  \node[font=\OrgSmall] at (194,\y+8) {\cam};
+  \draw[-{Stealth[length=2.6pt,width=3pt]},draw=black!65] (210,\y+8) -- (220,\y+8);
+  \draw[rounded corners=1.5pt,draw=black!45,fill=black!4] (220,\y+2) rectangle ++(14,12);
+  \node[font=\OrgTiny] at (227,\y+8) {Q};
+  \draw[-{Stealth[length=2.6pt,width=3pt]},draw=black!65] (234,\y+8) -- (242,\y+8);
+  \draw[rounded corners=2pt,draw=orgTeal!85,fill=orgTeal!6] (242,\y-1) rectangle ++(38,18);
+  \node[font=\OrgTiny,align=center] at (261,\y+8) {worker\\proc.};
+  \draw[-{Stealth[length=2.6pt,width=3pt]},draw=black!65] (280,\y+8) -- (288,\y+8);
+  \draw[rounded corners=2pt,draw=orgTeal!85,fill=white] (288,\y-1) rectangle ++(40,18);
+  \node[font=\OrgTiny,align=center] at (308,\y+8) {private\\session};
+}
+\node[font=\OrgTiny,align=center,text width=146pt] at (252,23) {Illustrated: speed-line $4\times1$.\\Common-model runtime uses $2\times2$ (two processes, two cameras each).};
+
+% T3 panel
+\foreach \y/\cam in {124/Cam 1,100/Cam 2,76/Cam 3,52/Cam 4}{%
+  \draw[rounded corners=2pt,draw=black!60] (350,\y) rectangle ++(32,16);
+  \node[font=\OrgSmall] at (366,\y+8) {\cam};
+  \draw[-{Stealth[length=2.6pt,width=3pt]},draw=black!65] (382,\y+8) -- (392,\y+8);
+  \draw[rounded corners=1.5pt,draw=black!45,fill=black!4] (392,\y+2) rectangle ++(14,12);
+  \node[font=\OrgTiny] at (399,\y+8) {Q};
+  \draw[-{Stealth[length=2.6pt,width=3pt]},draw=black!65] (406,\y+8) -- (416,96);
+}
+\draw[rounded corners=2pt,draw=orgOrange!85,fill=orgOrange!6] (416,76) rectangle ++(30,40);
+\node[font=\OrgTiny,align=center,text width=24pt] at (431,96) {sync /\\bundle};
+\draw[-{Stealth[length=3pt,width=3.2pt]},draw=black!70] (446,96) -- (454,96);
+\draw[rounded corners=2pt,draw=orgOrange!85,fill=white] (454,68) rectangle ++(34,56);
+\node[font=\OrgTiny,align=center,text width=26pt] at (471,96) {joint\\session\\4 logical\\branches};
+\node[font=\OrgTiny,align=center] at (471,54) {one call =\\4 pairs};
+\draw[-{Stealth[length=2.6pt,width=3pt]},draw=black!60,densely dashed] (471,68) -- (471,34);
+\draw[rounded corners=2pt,draw=black!55,fill=black!3] (446,12) rectangle ++(50,18);
+\node[font=\OrgTiny,align=center] at (471,21) {independent outputs / publish};
+\end{tikzpicture}%
+\endgroup%

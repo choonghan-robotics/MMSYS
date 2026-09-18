@@ -1,0 +1,47 @@
+% Conceptual BFP channel-permutation mechanism.
+% Editorial schematic derived from the manuscript's exact-arithmetic identity and
+% the documented BFP block size of eight; it is not a learned-graph dump.
+\begingroup%
+\definecolor{bfpBlue}{RGB}{0,87,132}%
+\definecolor{bfpOrange}{RGB}{185,82,25}%
+\definecolor{bfpGreen}{RGB}{0,125,92}%
+\newcommand{\BfpSmall}{\fontsize{6.7}{7.8}\selectfont}%
+\newcommand{\BfpTiny}{\fontsize{6.0}{7.0}\selectfont}%
+\newcommand{\BfpTitle}{\fontsize{7.7}{9.0}\selectfont\bfseries}%
+\begin{tikzpicture}[x=1pt,y=1pt,line width=0.42pt]
+\path[use as bounding box] (0,0) rectangle (236,142);
+
+\node[anchor=west,font=\BfpTitle,text=bfpOrange] at (0,136) {(a) Before permutation};
+\node[anchor=west,font=\BfpSmall] at (0,122) {Producer output channels};
+\foreach \i/\h/\shade in {0/26/75,1/8/18,2/10/22,3/7/16,4/9/20,5/6/14,6/8/18,7/7/16}{%
+  \draw[draw=black!55,fill=bfpOrange!\shade] ({3+13*\i},88) rectangle ++(11,\h);
+}
+\draw[draw=black!55] (3,84) -- (105,84);
+\draw[draw=black!55] (3,84) -- (3,87);
+\draw[draw=black!55] (105,84) -- (105,87);
+\node[anchor=north,font=\BfpTiny,align=center] at (54,80) {one BFP block: 8 input channels\\share one exponent};
+\node[anchor=north,font=\BfpTiny,text=bfpOrange,align=center,text width=104pt] at (54,61) {mixed scales within a block};
+
+\node[anchor=west,font=\BfpTitle,text=bfpGreen] at (126,136) {(b) After selected permutation};
+\node[anchor=west,font=\BfpSmall] at (126,122) {Reordered channels};
+\foreach \i/\h/\shade in {0/26/75,1/22/62,2/18/50,3/15/42,4/10/24,5/9/21,6/8/18,7/7/16}{%
+  \draw[draw=black!55,fill=bfpGreen!\shade] ({129+13*\i},88) rectangle ++(11,\h);
+}
+\draw[draw=black!55] (129,84) -- (231,84);
+\draw[draw=black!55] (129,84) -- (129,87);
+\draw[draw=black!55] (231,84) -- (231,87);
+\node[anchor=north,font=\BfpTiny,align=center] at (180,80) {same block size;\\channel membership changes};
+\node[anchor=north,font=\BfpTiny,text=bfpGreen,align=center,text width=104pt] at (180,61) {selected regrouping: lower measured error};
+
+\draw[-{Stealth[length=3pt,width=3pt]},draw=bfpBlue,line width=0.55pt] (107,106) -- (123,106);
+\node[font=\BfpTiny,text=bfpBlue,align=center] at (115,118) {$P$};
+
+\draw[rounded corners=2pt,draw=black!50,fill=black!2] (10,2) rectangle (226,43);
+\node[anchor=center,font=\BfpSmall,align=center,text width=202pt] at (118,30)
+  {Permute producer outputs by $P$ and every consumer input column by $P^{-1}$:};
+\node[anchor=center,font=\BfpSmall,align=center,text width=202pt] at (118,19)
+  {$x'=Px$, $W'=WP^{-1}$, so $W'x'=WP^{-1}Px=Wx$.};
+\node[anchor=center,font=\BfpTiny,text=black!70,align=center,text width=202pt] at (118,8)
+  {Exact arithmetic is unchanged; finite-precision block composition changes.};
+\end{tikzpicture}%
+\endgroup%
