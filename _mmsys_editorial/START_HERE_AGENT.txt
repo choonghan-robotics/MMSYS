@@ -7,3 +7,4 @@ main.tex의 EXP-EDIT 구간에서 E01~E13을 원본 protocol, model export, 평�
 기존 references.bib, fig/ 및 원본 그림 생성 코드를 보존하고, E09/E13에 필요한 데이터·의미 라벨만 근거에 따라 갱신하라.
 근거가 없으면 OPEN 또는 정직한 범위 제한으로 처리하라. 새 실험·재학습은 별도 승인 없이 시작하지 마라.
 완료 시 scope/preflight/evidence 검사와 실제 프로젝트 compile을 수행하고 main.tex, 변경 그림 코드, 근거표, diff, 실제 PDF를 반환하라.
+현재 post-agent audit 상태는 9 VERIFIED / 4 QUALIFIED(E03,E07,E10,E13)이다. 최종 제출 전 handoff/POST_AGENT_AUDIT.md의 잔여 작업을 해결하고 evidence source의 repository/archive/commit locator를 기록하라.
