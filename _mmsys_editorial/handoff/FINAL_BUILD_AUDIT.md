@@ -73,6 +73,7 @@ before the second/third `latexmk` pass resolves them — the correct check is th
   50.35432−41.51051) and `fig/trade.tex`'s plotted panel_b point for the same quantity
   (41.51299…, vs the canonical 41.51051) differ by 0.002pp. The figure generator chain was not
   traced in this pass; the generated `.tex` bytes were not hand-edited per instruction.
+- **E10 (QUALIFIED)**: the first decoder attempt's 45/256 raw sign-test p is verified, but its complete Holm family was not reconstructed; the manuscript therefore reports raw p only. The second-attempt Holm range was independently verified.
 - **E13 (QUALIFIED)**: same underlying gap as above — figure and prose are not yet confirmed to
   come from one canonical source for this one point. Every other figure/prose numeric claim checked
   in this and the prior pass matched exactly (pooled frame counts, classical-profile band values,
@@ -96,7 +97,4 @@ before the second/third `latexmk` pass resolves them — the correct check is th
 
 ## Submission readiness
 
-All E01–E13 items are closed (11 VERIFIED, 2 QUALIFIED with disclosed, non-fabricated residual
-gaps; 0 OPEN). The build is clean. The two QUALIFIED items are both small (≤0.002pp / one unlocated
-secondary source), do not affect any headline claim, and are stated plainly rather than hidden.
-Whether that residual risk is acceptable for submission is the authors' call, not this audit's.
+All E01–E13 items are closed with **9 VERIFIED and 4 QUALIFIED (E03, E07, E10, E13), 0 OPEN**. The build is clean. QUALIFIED items are disclosed rather than silently promoted: E03 lacks the complete FP→QAT phase linkage/internal-split source; E07/E13 retain the ~0.002pp figure/prose provenance gap; E10 reports the first 45/256 result as raw p because its complete Holm family is not archived. Whether these bounded residual risks are acceptable for submission is the authors' decision.
