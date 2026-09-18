@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "manuscript": "main.tex",
+  "tasks": [
+    {
+      "id": "E01",
+      "status": "OPEN"
+    },
+    {
+      "id": "E02",
+      "status": "OPEN"
+    },
+    {
+      "id": "E03",
+      "status": "OPEN"
+    },
+    {
+      "id": "E04",
+      "status": "OPEN"
+    },
+    {
+      "id": "E05",
+      "status": "OPEN"
+    },
+    {
+      "id": "E06",
+      "status": "OPEN"
+    },
+    {
+      "id": "E07",
+      "status": "OPEN"
+    },
+    {
+      "id": "E08",
+      "status": "OPEN"
+    },
+    {
+      "id": "E09",
+      "status": "OPEN"
+    },
+    {
+      "id": "E10",
+      "status": "OPEN"
+    },
+    {
+      "id": "E11",
+      "status": "OPEN"
+    },
+    {
+      "id": "E12",
+      "status": "OPEN"
+    },
+    {
+      "id": "E13",
+      "status": "OPEN"
+    }
+  ]
+}
