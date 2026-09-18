@@ -1,100 +1,154 @@
-# Final build audit — 2026-09-18
+# Final build audit — 2026-09-18 (submission finalization pass)
 
-## Build command
+Scope of this pass: pre-submission finalization only. No new experiment, no retraining, no new
+baseline, and no re-verification of items already closed. Implementation/evidence checks, minimal
+manuscript corrections, and the final PDF build.
 
-Isolated Docker build, no network, read-only source mount, deterministic
-`SOURCE_DATE_EPOCH` bound to the commit timestamp:
+**Paper repository: not designated.** Per the standing policy in `POST_AGENT_AUDIT.md` and the
+user's instruction, the target paper repository and base branch are user-supplied and were not
+supplied for this pass. Nothing was pushed anywhere. The changes below exist as an uncommitted
+working-tree diff against source commit `3868891dd8cb71fc5276fcd3259af613ff0a2d3d`.
 
-```
-docker run --rm --network none --user 1000:1000 --cap-drop ALL \
-  --security-opt no-new-privileges --cpus 2 --memory 2g \
-  --entrypoint /bin/sh -v <source>:/paper:ro -v <output>:/output -w /output \
-  -e SOURCE_DATE_EPOCH=<commit_ts> -e FORCE_SOURCE_DATE=1 \
-  -e TEXINPUTS=.//:/paper//: -e BIBINPUTS=.:/paper: \
-  multistereo-paper:20260910-r15-local \
-  -c 'cp -a /paper/. /output/ && latexmk -pdf -interaction=nonstopmode main.tex'
-```
+## 1. Queue implementation — checked against code, manuscript corrected
 
-Toolchain: `multistereo-paper:20260910-r15-local` (image digest `sha256:1bbac043ad87…`),
-`latexmk` driving `pdflatex` + `bibtex`/`biber` to a fixed point, `acmart` class.
+Read directly: `tools/rbq_sustained_replay_npu.py` (replay), `tools/rbq_e3_npu.py` and
+`src/stereort/e3_frame_ring.py` (physical).
 
-## A real defect found and fixed by this audit step
+| Question | Finding in code |
+|---|---|
+| FIFO or latest-only? | **FIFO.** Replay: `pending[served].popleft()`. Physical: `RingReader.pending()` returns the oldest unserved sequence. Neither path takes "the latest pair". |
+| Cross-stream selection | Oldest-first by capture stamp. Replay: `min` over each non-empty stream's **head** frame `captured_at`, ties broken by a rotating index. Physical: the stream whose pending frame has the smallest `capture_monotonic`. |
+| `popleft` or `pop` on overflow? | **`popleft`** — the **oldest** queued frame is discarded, not the newest. |
+| Overflow accounting | Discard increments `replaced[sid]`; the physical reader increments `self.replaced` by the number of sequences the producer overwrote past the bound (`oldest - next_sequence`). Both feed the acceptance policy's replacement rate. |
+| Queue-wait timestamp | Replay: `queue_ms = dequeued - frame["captured_at"]`, and `captured_at` is the frame's **scheduled** arrival (`next_capture[sid]`), so the interval includes dispatch lag. Physical: `queue_ms = dequeued - published_at` (ring publication instant), with `usb_ms = published_at - captured_at` reported separately. |
 
-The first build attempt on the manuscript as pulled from Overleaf failed to resolve: **every**
-citation and **every** internal cross-reference in the document (`\ref`, `\cite`, section labels,
-figure/table labels — all of them, not a subset). Root cause, found in the raw log at
-`! Missing $ inserted.` around line 300: the sentence added by the prior post-agent audit pass
+**Manuscript correction (minimal).** The T1 sentence said a round-robin scheduler "takes the
+**latest** pair from each non-empty camera slot" — contradicted by the code in both paths. Rewritten
+to state oldest-pending selection by earliest capture stamp with rotation as the tie-break and FIFO
+dequeue. The queue sentence now also states FIFO service, oldest-frame discard, the physical
+reader's equivalent bound, and the two queue-wait timestamp definitions. **No measured value was
+changed or removed**; the 234–242 ms mean host-side wait stands exactly as reported.
 
-```
-...computed before display rounding from 50.35432$-$41.51051$=8.84381, that is 98.0\%...
-```
+## 2. E03 — the bad3 range is sourced; grammar fixed
 
-opens a third, unmatched `$` (`$=8.84381,`) after the balanced `$-$`, putting the rest of the
-document into unterminated math mode. `pdflatex` recovers locally but the resulting `.aux` file is
-corrupted for the remainder of the run, so `bibtex`/`biber` and every reference resolve against a
-broken auxiliary file. This would not have been caught by the scope-authorization check (a purely
-textual diff) or by resolutions.json bookkeeping — only an actual compile catches it, which is the
-reason this step exists.
+The range **19.988–36.355% → 11.410–13.838%** was located exactly. It is the **KITTI 2015
+`native_bad3_macro_median_percent`** on the campaign's **63-pair internal validation split** (28
+KITTI-2015 + 35 KITTI-2012 pairs), across the eight seed-0 candidates, moving from the
+quantization-aware phase's **initial validation** to its **terminal epoch**:
 
-**Fix**: closed the mode properly as a single expression, `$50.35432-41.51051=8.84381$`. Rebuilt;
-zero undefined citations, zero undefined references, both confirmed against the final pass's own
-log, not the cumulative multi-pass log (which always shows transient undefined-reference warnings
-before the second/third `latexmk` pass resolves them — the correct check is the *last* pass).
+| candidate | QAT initial | QAT terminal |
+|---|---:|---:|
+| S6-H128 | 30.1135 | 12.0137 |
+| S6-H96 | 24.0138 | 12.7407 |
+| S6-H64 | 20.3407 | 13.8382 |
+| L6-H256 | 27.6546 | 11.4102 |
+| L6-H192 | **36.3546** | 11.8624 |
+| L6-H128 | **19.9879** | 11.9562 |
+| J6-H128 | 27.9673 | 12.7239 |
+| J6-H96 | 26.4613 | 12.0448 |
 
-## Results after the fix
+Sources: `experiments/specialized_six_models_20260909/qat/<candidate>/seed0/TERMINAL.json`
+(`initial_validation`) and the terminal record of the matching `history.jsonl` (epoch 63
+`validation`). Both printed endpoints reproduce exactly. The sentence was therefore **kept and made
+explicit** about stage, split and aggregation rather than deleted.
+
+**8/8 full-precision admission — confirmed**, not assumed:
+`fp32_development/<candidate>/seed0/ADMISSION.json` reports
+`fp32_development_oak_gate_passed: true` with both per-dataset gates true for all eight candidates.
+
+**Grammar**: `"... exceeded its bad3 median, Thus, ..."` → `"... exceeded its bad3 median. Thus, ..."`.
+
+Remaining E03 gap: the full per-candidate **FP terminal → QAT initial → QAT terminal → export**
+linkage in one table is still not assembled (the export stage lives in a different record against a
+different population). E03 therefore stays **QUALIFIED**, not promoted.
+
+## 3–4. Fig. 3(b) — caption corrected, and the "discrepancy" was not one
+
+`FIGURES_R1.json` `/figures_in_the_manuscript[1]/derived/panel_b` stores **two values per artifact**
+(`sf` synthetic, `ds` driving) and a four-value classical band (SceneFlow 41.6826/42.5851,
+DrivingStereo 41.8262/46.8659). The panel plots the two populations **separately**; the old caption's
+"macro-averaged over the 512-pair development population" implied a single merged population.
+Corrected to name the 256-pair synthetic and 256-pair driving populations separately. The band's
+"not a confidence interval or a shared admission threshold" limitation is retained verbatim.
+
+**The previously recorded ~0.002 pp figure/prose discrepancy does not exist.** Checked by condition
+rather than by value: `panel_b`'s `records_read` are
+`permutation_npu512_opt3_r1/output/RESULT.json` and
+`permutation_opt3_actual_dev_r1/output/DEVELOPMENT_000000.json`, both carrying
+`"optimize_level": 3` and the value `41.51299370659722`. The prose's 41.51051 is the **level-1**
+silicon measurement. Different optimization levels, same artifact — not a same-condition mismatch,
+so nothing was unified. A short caption clause now says panel (b) is level 3, so a reader does not
+repeat the comparison. The BFP arithmetic (50.35432 − 41.51051 = 8.84381 → 8.844 pp, 98.0%) is
+untouched.
+
+## 5. Architecture figure — caption corrected, figure untouched
+
+`tools/rbq_fig_architecture.py` reads the drawn stages, shapes and kernel extents **off the S11
+graph** (`splits['S11']`, `geom['S11']`, "Shapes and kernel extents read off the S11 graph"), then
+annotates S5 and S11d as the two variants that differ. So **S11 is the pipeline shown**, and the
+prior claim that the figure omits S11 was wrong. Caption now reads "Speed-line soft-argmax pipeline
+with the S5 and S11d modifications indicated…", and the matching prose sentence was corrected the
+same way. No figure source byte was edited.
+
+## 6. Final build
+
+Same isolated toolchain as before: `multistereo-paper:20260910-r15-local`, `--network none`,
+`--read-only` source mount, `SOURCE_DATE_EPOCH` bound to the source commit, `latexmk -pdf` to a
+fixed point with the real `fig/`, `references.bib` and ACM class assets.
 
 | Check | Result |
 |---|---|
 | LaTeX fatal errors | 0 |
 | Undefined citations (final pass) | 0 |
 | Undefined references (final pass) | 0 |
-| Duplicate labels | 0 (none reported) |
-| Missing figures | 0 (`fig/arch.tex`, `fig/path_a.tex`, `fig/trade.tex`, `fig/quad_cam.png` all resolved) |
-| Overfull `\hbox` (final pass) | 0 |
-| Bibliography | Generated; `natbib`/ACM-Reference-Format, all ~40 keys resolve |
-| Page count | 13 (body through page 10, references start page 11 — within "10 pages plus references") |
-| Final PDF SHA-256 | `dddf3d7748556b9f67d6ef66f99e12c950e0ec897d42353e6599d61b5138bfdf` |
+| Duplicate/multiply-defined labels | 0 |
+| Missing figures | 0 |
+| Overfull `\hbox` | 0 |
+| Bibliography | generated, 49 entries |
+| Total pages | 13 |
+| References start | page 11 |
+| Table overflow | none (Table 1 and Table 2 render inside the text block) |
+| Fig. 1 / 2 / 3 | rendered and inspected; legible, no clipping |
+| PDF metadata | no `Author` field; no author-identifying string (`pdfinfo` scan for name/affiliation/e-mail returns 0 hits) |
+| **Final PDF SHA-256** | `b05210e960cc1153692e92851ad71dd99deed0f5239f46552d6f07d8adc8283a` |
 
-## Figure visual check (rendered at 70–90 DPI, inspected)
+This hash is newly issued for this build; the earlier
+`dddf3d77…` hash belongs to the previous pass and is superseded.
 
-- **Fig. 1** (`fig/quad_cam.png`, page 1): renders cleanly, legible at print size, no clipping.
-- **Fig. 2** (`fig/arch.tex`, page 8): renders cleanly; S5 and S11d labels are both legible and
-  distinct, matching the caption's explicit statement that S11 itself is a different (soft-argmax)
-  artifact from the pictured S11d screen variant.
-- **Fig. 3(a)/(b)** (`fig/path_a.tex` + `fig/trade.tex`, page 10): both panels legible, no text
-  clipping, classical-profile band explicitly captioned as "not a confidence interval or a shared
-  admission threshold" (matches E13's requirement that it not be mislabeled as a CI).
-- **Table 2** (`tab:sustained`, page 8): all thirteen rows render inside the column width, no
-  overflow.
+### Page-budget finding (unresolved, authors' decision)
 
-## Remaining limitations (carried from resolutions.json, not resolved by this build step)
+**The body does not fit in 10 pages, and did not before this pass either.** With the references
+beginning on page 11, roughly 1.5 columns of body text (the tail of Limitations and the Conclusion)
+sit above them on that page:
 
-- **E07 (QUALIFIED)**: the manuscript's canonical BFP recovery value (8.844, from unrounded
-  50.35432−41.51051) and `fig/trade.tex`'s plotted panel_b point for the same quantity
-  (41.51299…, vs the canonical 41.51051) differ by 0.002pp. The figure generator chain was not
-  traced in this pass; the generated `.tex` bytes were not hand-edited per instruction.
-- **E10 (QUALIFIED)**: the first decoder attempt's 45/256 raw sign-test p is verified, but its complete Holm family was not reconstructed; the manuscript therefore reports raw p only. The second-attempt Holm range was independently verified.
-- **E13 (QUALIFIED)**: same underlying gap as above — figure and prose are not yet confirmed to
-  come from one canonical source for this one point. Every other figure/prose numeric claim checked
-  in this and the prior pass matched exactly (pooled frame counts, classical-profile band values,
-  S5-under-T2L single-window count).
-- **E03's specific internal-validation-split bad3 range** (19.988–36.355% → 11.410–13.838%) has no
-  located source file in this repository as of this pass, though the surrounding claim (0/8
-  candidates pass export-stage admission) is independently confirmed from all 8 candidates' real
-  `ADMISSION.json` records.
-- Evidence provenance is real but partial: 11 of the distinct cited files are committed to
-  `git@github.com:ETRI-OAC/Multi_Stereo.git` at commit `c0b2b3db3c60ea66794784fd9456db6b5e615947`
-  (repository + commit + path, independently resolvable by a third party with access to that
-  repository). The remainder sit under that repository's own `experiments/*/*/` `.gitignore` rule
-  (bulk per-candidate exports and admission dumps) and are recorded as local-filesystem SHA-256
-  attestations with that limitation stated, not force-added against the project's own exclusion
-  policy.
-- This audit did not have access to, and did not attempt to create, a pull request against
-  `choonghan-robotics/MMSYS` on GitHub — this session's paper submodule tracks an Overleaf git
-  bridge (`git.overleaf.com`), not that repository, and no credentials or remote for it were
-  available. The verified `main.tex` and `_mmsys_editorial/` changes were pushed directly to the
-  Overleaf project instead, which is this session's actual delivery channel.
+- source commit `3868891` as pulled: **88** body lines on page 11 before the first reference;
+- after this pass's corrections: **94** body lines — a net `+519` characters, about six lines.
+
+So the overflow is pre-existing and this pass added ~7% to it while fixing four factual errors. I
+did not cut content to force the fit: length decisions were reserved by the authors. To land the
+body inside 10 pages, about 1.5 columns must come out; the Limitations paragraph and the R6
+execution-cost subsection are the largest compressible blocks.
+
+One float-packing note, in case the text is edited further: at the source commit, Table 2 and
+Figure 2 pack together on page 8. Adding roughly 800 characters anywhere before them splits that
+pair across pages 8 and 9 and costs a full page, pushing the references to page 12. The corrections
+in this pass were compressed until that packing was restored.
+
+## Verification ledger
+
+Unchanged by this pass: **9 VERIFIED, 4 QUALIFIED (E03, E07, E10, E13), 0 OPEN**, as recorded in
+`POST_AGENT_AUDIT.md`. Two of this pass's findings bear on that ledger and are recorded here rather
+than used to promote anything:
+
+- **E07/E13's figure–prose gap is explained** (level 3 vs level 1, same artifact), which removes the
+  stated reason for the discrepancy but does not by itself establish single-canonical-source
+  generation, so neither item is promoted here.
+- **E03's internal-split range is now sourced exactly**, but the full FP→QAT→export candidate
+  linkage is still not assembled, so E03 stays QUALIFIED.
 
 ## Submission readiness
 
-All E01–E13 items are closed with **9 VERIFIED and 4 QUALIFIED (E03, E07, E10, E13), 0 OPEN**. The build is clean. QUALIFIED items are disclosed rather than silently promoted: E03 lacks the complete FP→QAT phase linkage/internal-split source; E07/E13 retain the ~0.002pp figure/prose provenance gap; E10 reports the first 45/256 result as raw p because its complete Holm family is not archived. Whether these bounded residual risks are acceptable for submission is the authors' decision.
+**Not ready as-is — one blocking item: the body exceeds the 10-page limit** (see above). Every other
+mechanical check passes: clean build, no undefined references or citations, no overfull boxes,
+figures legible, anonymous metadata. Once ~1.5 columns are removed from the body, the same build
+procedure reproduces a submittable PDF.
