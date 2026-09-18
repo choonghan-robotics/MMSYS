@@ -4,55 +4,61 @@
   "tasks": [
     {
       "id": "E01",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E02",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E03",
-      "status": "OPEN"
+      "status": "QUALIFIED"
     },
     {
       "id": "E04",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E05",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E06",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E07",
-      "status": "OPEN"
+      "status": "QUALIFIED"
     },
     {
       "id": "E08",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E09",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E10",
-      "status": "OPEN"
+      "status": "QUALIFIED"
     },
     {
       "id": "E11",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E12",
-      "status": "OPEN"
+      "status": "VERIFIED"
     },
     {
       "id": "E13",
-      "status": "OPEN"
+      "status": "QUALIFIED"
     }
-  ]
+  ],
+  "summary": {
+    "verified": 9,
+    "qualified": 4,
+    "open": 0,
+    "note": "Mirrors resolutions.json after post-agent audit; QUALIFIED is not equivalent to VERIFIED."
+  }
 }
