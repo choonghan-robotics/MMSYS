@@ -1,0 +1,37 @@
+{
+  "base_commit": "9e9439c7213b5af16eaea79b91d96b6eab2a619c",
+  "base_git_blob": "53c3417a8332fd50da452ef40c15f8769ae00caa",
+  "original_sha256": "e5927af773f7d38e8313528367c557ffd7a0383a0798b38273505ea4a6954373",
+  "edited_sha256": "d74cb201792c16aea30897918aa3b412f9f9eb4ce7e3f1455024357b58419896",
+  "paragraphs_edited": 61,
+  "count_method": "texcount -sum -1 (main.tex only; external figure/bibliography text excluded equally)",
+  "word_counts": {
+    "original": 10243,
+    "edited": 8359
+  },
+  "reduction_words": 1884,
+  "reduction_percent": 18.39,
+  "citation_keys": 49,
+  "citation_occurrences_unchanged": true,
+  "section_headings_unchanged": true,
+  "full_table_environments_byte_equal": true,
+  "table_data_rows": [
+    5,
+    8
+  ],
+  "figure_input_calls_unchanged": true,
+  "preamble_layout_parameters_unchanged": true,
+  "labels_total": 18,
+  "new_nonprinting_label": "mmsys:body-end",
+  "undefined_source_cross_references": [],
+  "absent_numeric_strings": [],
+  "added_numeric_strings": [],
+  "assets": {
+    "fig/arch.tex": "e2e63f2c51d6bbe526f49375639edc77c927988d",
+    "fig/path_a.tex": "6e8d1964e38b97a019630ac028d960aec958677a",
+    "fig/trade.tex": "5094f1299482c5147fbda9ee04b9ddea950d1a14"
+  },
+  "full_build_verified_here": false,
+  "full_build_limitation": "Original quad_cam.png binary could not be retrieved into the runtime. No submission PDF is included. Layout diagnostics use explicit photo-area reservations and two-digit citation-width markers, without a generated bibliography.",
+  "paper_repository_policy": "User supplies target repository/path and branch; no repository is selected by the helper; no push or merge performed."
+}
